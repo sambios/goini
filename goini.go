@@ -35,17 +35,17 @@ func isSection(section string) bool {
 }
 
 // Read parses a specified configuration file and returns a Configuration instance.
-func (c *IniFile) Parse(filePath string) (error) {
+func Parse(filePath string) (*IniFile, error) {
 	filePath = path.Clean(filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
-	// New section
-	c.sections = make(map[string]*list.List)
-	c.filePath = filePath
+	// New File
+	c := NewIniFile(filePath)
+
 	activeSection := c.AddSection("global")
 
 	scanner := bufio.NewScanner(bufio.NewReader(file))
@@ -66,10 +66,10 @@ func (c *IniFile) Parse(filePath string) (error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return c, nil
 }
 
 func (c *IniFile) AddSection(name string) *Section {
